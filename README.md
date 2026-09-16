@@ -12,7 +12,7 @@ This repository is the **standalone workshop submission**. Game-specific copy an
 - Playable Canvas demo behind a replaceable adapter
 - Accessible host/join lobby with local preview fallback
 - WebSocket room server supporting four slots
-- AWS CDK stack: S3, CloudFront, ECS Fargate, ALB, and CloudWatch Logs
+- AWS CDK stack: low-cost S3 + CloudFront by default, with ECS Fargate, ALB, and CloudWatch Logs as an explicit multiplayer option
 - GitHub Actions for verification and OIDC-based AWS deployment
 
 ## Quick start
@@ -68,13 +68,15 @@ infra/                  AWS CDK application
 
 ## AWS deployment
 
-The stack serves the static site and WebSocket endpoint from one CloudFront domain. The browser automatically selects `wss://<current-host>/socket` outside localhost, avoiding mixed-content and environment-variable handoffs.
+The default stack serves the static site from a private S3 bucket through CloudFront and creates no always-on compute. The lobby uses its local fallback in this mode.
+
+When the real multiplayer loop is ready, deploy with the `multiplayer` context. That adds a same-origin WebSocket endpoint on ECS Fargate behind an Application Load Balancer; the browser automatically selects `wss://<current-host>/socket`.
 
 Prerequisites:
 
 - An AWS account
 - AWS CDK bootstrap completed in the target account and region
-- Docker available for the Fargate image asset
+- Docker available only when deploying the optional Fargate multiplayer service
 - An AWS role trusted by GitHub OIDC for automated deployment
 
 Manual deployment:
@@ -93,7 +95,7 @@ npx cdk bootstrap
 npm run deploy
 ```
 
-The stack outputs `SiteUrl` and `MultiplayerWebSocketUrl`.
+The stack outputs `SiteUrl` and `DeploymentMode`. To add the persistent room server later, run `npm run deploy:multiplayer` from `infra/`; that mode also outputs `MultiplayerWebSocketUrl`.
 
 For GitHub deployment, add `AWS_ROLE_ARN` as an environment secret and optionally set the `AWS_REGION` repository variable. Push a `v*` tag or run the workflow manually.
 
