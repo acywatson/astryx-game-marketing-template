@@ -4,6 +4,8 @@ A reusable React 19 marketing site for browser-playable games. It combines Astry
 
 This repository is the **standalone workshop submission**. Game-specific copy and assets belong in a separate repository; `neon-cactus-showcase` is the reference implementation created from this template.
 
+**Live preview:** https://d2nncbs69exr0p.cloudfront.net
+
 ## What ships
 
 - Responsive game-marketing homepage built with Astryx 0.6.2
@@ -68,9 +70,9 @@ infra/                  AWS CDK application
 
 ## AWS deployment
 
-The default stack serves the static site from a private S3 bucket through CloudFront and creates no always-on compute. The lobby uses its local fallback in this mode.
+The default stack serves the static site from a private S3 bucket through CloudFront and creates no always-on compute. The lobby uses its local fallback in this mode because `VITE_MULTIPLAYER_ENABLED` defaults to `false`.
 
-When the real multiplayer loop is ready, deploy with the `multiplayer` context. That adds a same-origin WebSocket endpoint on ECS Fargate behind an Application Load Balancer; the browser automatically selects `wss://<current-host>/socket`.
+When the real multiplayer loop is ready, rebuild the site with `VITE_MULTIPLAYER_ENABLED=true`, then deploy with the `multiplayer` context. That adds a same-origin WebSocket endpoint on ECS Fargate behind an Application Load Balancer; the browser automatically selects `wss://<current-host>/socket`.
 
 Prerequisites:
 
